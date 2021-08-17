@@ -61,9 +61,6 @@ public class UserService {
     public TokenDto authorization(String userName, String password){
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userName, password));
         var expectedUser = findByName(userName);
-        if (expectedUser == null) {
-            return null;
-        }
         String token = jwtTokenProvider.createToken(userName, List.of(expectedUser.getRoles()));
         return new TokenDto(userName, token);
     }

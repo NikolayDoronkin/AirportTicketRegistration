@@ -8,6 +8,8 @@ import com.nikolay.doronkin.businessengine.model.Airport;
 import com.nikolay.doronkin.businessengine.repository.AirportRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
@@ -44,7 +46,10 @@ public class AirportService {
     }
 
     @Transactional
-    public AirportDto create(@Valid AirportRequest airportRequest) {
+    public AirportDto create(AirportRequest airportRequest) {
+        if(airportRepository.existsAirportByName(airportRequest.getName())){
+            throw new EntityExistsException(ExceptionMessages.ENTITY_EXISTS_BY_NAME + airportRequest.getName());
+        }
         Airport createdAirport = Airport.builder()
                 .name(airportRequest.getName())
                 .city(airportRequest.getCity())

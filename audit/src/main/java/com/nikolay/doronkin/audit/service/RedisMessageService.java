@@ -14,5 +14,4 @@ public class RedisMessageService {
     public void saveMessage(AuditMessage auditMessage) {
         auditMessageRepository.save(auditMessage);
     }
-
 }

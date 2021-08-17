@@ -15,10 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
+import redis.clients.jedis.Jedis;
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @RestController
@@ -28,14 +30,16 @@ public class FlightController {
 
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
+    private final Jedis jedis;
 
     private static final String TOKEN = "Token";
     private static final String REQUEST_BODY = "";
     private static final String AUTHORIZATION = "Authorization";
     private static final String CONTENT_TYPE_HEADER = "Content-Type";
+    private static final String KEY = "AuditMessage:nicolaydm@gmail.com";
 
     @GetMapping("/all")
-    public void getAllFlights() throws URISyntaxException {
+    public Map<String, String> getAllFlights() throws URISyntaxException {
         HttpServletRequest httpServletRequest = (
                 (ServletRequestAttributes) Objects
                         .requireNonNull(
@@ -68,5 +72,6 @@ public class FlightController {
         objectMapper.convertValue(
                 allFlights.getBody(),
                 new TypeReference<>() {});
+        return jedis.hgetAll(KEY);
     }
 }
