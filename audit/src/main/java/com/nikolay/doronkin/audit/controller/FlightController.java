@@ -36,6 +36,7 @@ public class FlightController {
     private static final String REQUEST_BODY = "";
     private static final String AUTHORIZATION = "Authorization";
     private static final String CONTENT_TYPE_HEADER = "Content-Type";
+    private static final String BUSINESS_URL = "http://localhost:8081";
     private static final String KEY = "AuditMessage:nicolaydm@gmail.com";
 
     @GetMapping("/all")
@@ -45,22 +46,9 @@ public class FlightController {
                         .requireNonNull(
                                 RequestContextHolder.getRequestAttributes()))
                 .getRequest();
-        String BUSINESS_URL = "http://localhost:8081";
-        URI uri = new URI(BUSINESS_URL);
-        String requestUrl = httpServletRequest.getRequestURI();
-        uri = UriComponentsBuilder
-                .fromUri(uri)
-                .path(requestUrl)
-                .query(
-                        httpServletRequest.getQueryString()
-                )
-                .build(true)
-                .toUri();
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.set(CONTENT_TYPE_HEADER, httpServletRequest.getHeader(CONTENT_TYPE_HEADER));
+        URI uri = restClient.createURI(BUSINESS_URL, httpServletRequest);
+        HttpHeaders httpHeaders = restClient.createHeader(CONTENT_TYPE_HEADER, httpServletRequest, AUTHORIZATION, TOKEN);
         HttpEntity<String> httpEntity = new HttpEntity<>(REQUEST_BODY, httpHeaders);
-        String token = httpServletRequest.getHeader(TOKEN);
-        httpHeaders.set(AUTHORIZATION, token);
         ResponseEntity<List<Object>> allFlights
                 = restClient
                 .getBusinessEngineResponse(
